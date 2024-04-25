@@ -1,0 +1,3 @@
+(executables 
+ (names fib qsort qsort_array msort)
+ (libraries moonpool))
