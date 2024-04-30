@@ -26,13 +26,13 @@ let mk_Name () =
         let x = Comb (ret, cnt_pos) in 
         let smaller = QSort x in 
         let larger = QSort (cnt_neg) in 
-        Array (ar, left, right) -- Part (smaller, larger)
+        Array (ar, left, right) -><- Part (smaller, larger)
 
-      | Array (ar, left, right), QSort (ret) -> Array (ar, left, right) -- ret
+      | Array (ar, left, right), QSort (ret) -> Array (ar, left, right) -><- ret
 
-      | Array _, Comb (ret, b) -> b -- Comb' ret
+      | Array _, Comb (ret, b) -> b -><- Comb' ret
 
-      | Array (ar, left, right), Comb' ret -> Array (ar, left, right) -- ret
+      | Array (ar, left, right), Comb' ret -> Array (ar, left, right) -><- ret
 
       | Array (ar, left, right), Part (smaller, larger) -> 
         let i = ref left in 
@@ -65,18 +65,18 @@ let mk_Name () =
             i := right
         ;
 
-        Array (ar, left, !i-1) -- smaller; 
-        Array (ar, !i+1, right) -- larger
+        Array (ar, left, !i-1) -><- smaller; 
+        Array (ar, !i+1, right) -><- larger
 
-      | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -- a)  
+      | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -><- a)  
       | a, NameNeg v -> F.fulfill v (Ok a)
 
-    and ( -- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
+    and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
       fun a1 a2 ->
       R.run_async pool (fun _ -> apply_rule a1 a2)
     in
 
-    a1 -- a2 
+    a1 -><- a2 
 
 let rec decode_array = function 
   | Array (ar, _, _) -> ar 

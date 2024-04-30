@@ -30,35 +30,35 @@ let rec decode_list = function
 let apply_rule pool a1 a2 =
   let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit = 
     fun a1 a2 -> match a1, a2 with 
-    | LNil, QSort ret -> LNil -- ret 
+    | LNil, QSort ret -> LNil -><- ret 
     | LCons (x, xs), QSort ret -> 
       let right_pos, right_neg = mk_Name () in 
       let smaller = QSort (Append (ret, LCons (x, right_pos))) in 
       let larger = QSort (right_neg) in 
-      xs -- (Part (x, smaller, larger)) 
-    | LNil, Part (_, a, b) -> LNil -- a; LNil -- b 
+      xs -><- (Part (x, smaller, larger)) 
+    | LNil, Part (_, a, b) -> LNil -><- a; LNil -><- b 
     | LCons (y, ys), Part (x, smaller, larger) when y < x -> 
       let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (y, cnt_pos)) -- smaller; 
-      ys -- (Part (x, cnt_neg, larger)) 
+      (LCons (y, cnt_pos)) -><- smaller; 
+      ys -><- (Part (x, cnt_neg, larger)) 
     | LCons (y, ys), Part (x, smaller, larger) -> 
       let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (y, cnt_pos)) -- larger; 
-      ys -- (Part (x, smaller, cnt_neg))
-    | LNil, Append (ret, listB) -> listB -- ret 
+      (LCons (y, cnt_pos)) -><- larger; 
+      ys -><- (Part (x, smaller, cnt_neg))
+    | LNil, Append (ret, listB) -> listB -><- ret 
     | LCons (x, xs), Append (ret, listB) -> 
       let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (x, cnt_pos)) -- ret; 
-      xs -- (Append (cnt_neg, listB)) 
-    | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -- a)  
+      (LCons (x, cnt_pos)) -><- ret; 
+      xs -><- (Append (cnt_neg, listB)) 
+    | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -><- a)  
     | a, NameNeg v -> F.fulfill v (Ok a)
 
-  and ( -- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
+  and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
     fun a1 a2 ->
     R.run_async pool (fun _ -> apply_rule a1 a2)
   in
 
-  a1 -- a2 
+  a1 -><- a2 
 
 let qsort pool l = 
   let l_agent = encode_list l in 

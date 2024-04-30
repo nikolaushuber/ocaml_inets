@@ -1,0 +1,3 @@
+(executables 
+  (names fib_par fib_seq)
+  (libraries moonpool))

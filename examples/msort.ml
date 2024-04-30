@@ -33,34 +33,34 @@ let apply_rule pool a1 a2 =
   let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit = 
     fun a1 a2 -> match a1, a2 with 
     (* [] >< MSort(ret) => [] ~ ret *)
-    | LNil, MSort ret -> LNil -- ret 
+    | LNil, MSort ret -> LNil -><- ret 
 
     (* x :: xs >< MSort (ret) => xs ~ MSort_tail[x](ret)*)
-    | LCons (x, xs), MSort ret -> xs -- MSort_tail (x, ret)
+    | LCons (x, xs), MSort ret -> xs -><- MSort_tail (x, ret)
 
     (* [] >< MSort_tail[n](ret) => [n] ~ ret *)
-    | LNil, MSort_tail (n, ret) -> LCons (n, LNil) -- ret 
+    | LNil, MSort_tail (n, ret) -> LCons (n, LNil) -><- ret 
 
     (* x :: xs >< MSort_tail[n](ret) => 
         n :: x :: xs ~ split(left, right), 
         MSort(a) ~ left, 
-        MSort(b) ~ right, Merge(ret, b) ~a 
+        MSort(b) ~ right, Merge(ret, b) ~ a 
     *)
     | LCons (x, xs), MSort_tail (n, ret) -> 
       let b_pos, b_neg = mk_Name () in 
       let a = Merge (ret, b_pos) in 
       let left = MSort a in 
       let right = MSort b_neg in 
-      LCons (n, LCons (x, xs)) -- Split (left, right)
+      LCons (n, LCons (x, xs)) -><- Split (left, right)
 
     (* [] >< Merge(ret, snd) => snd ~ ret *)
-    | LNil, Merge (ret, snd) -> snd -- ret 
+    | LNil, Merge (ret, snd) -> snd -><- ret 
 
     (* x :: xs >< Merge(ret, snd) => snd ~ MergeCC[x](ret, xs)*)
-    | LCons (x, xs), Merge (ret, snd) -> snd -- MergeCC (x, ret, xs)
+    | LCons (x, xs), Merge (ret, snd) -> snd -><- MergeCC (x, ret, xs)
 
     (* [] >< MergeCC[y](ret, ys) => y :: ys ~ ret *)
-    | LNil, MergeCC (y, ret, ys) -> LCons (y, ys) -- ret
+    | LNil, MergeCC (y, ret, ys) -> LCons (y, ys) -><- ret
 
     (* x :: xs >< MergeCC (y, ret, ys) 
         | x <= y  => x :: cnt ~ ret, xs ~ MergeCC[y](cnt, ys)
@@ -68,35 +68,35 @@ let apply_rule pool a1 a2 =
     *)
     | LCons (x, xs), MergeCC (y, ret, ys) when x <= y -> 
       let cnt_pos, cnt_neg = mk_Name () in 
-      LCons (x, cnt_pos) -- ret ; 
-      xs -- MergeCC (y, cnt_neg, ys)
+      LCons (x, cnt_pos) -><- ret ; 
+      xs -><- MergeCC (y, cnt_neg, ys)
 
     | LCons (x, xs), MergeCC (y, ret, ys) -> 
       let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (y, cnt_pos)) -- ret; 
-      ys -- MergeCC (x, cnt_neg, xs) 
+      (LCons (y, cnt_pos)) -><- ret; 
+      ys -><- MergeCC (x, cnt_neg, xs) 
 
     (* [] >< Split(right, left) => [] ~ right, [] ~ left *)
-    | LNil, Split (right, left) -> LNil -- right; LNil -- left 
+    | LNil, Split (right, left) -> LNil -><- right; LNil -><- left 
 
     (* x :: xs >< Split(right, left) => 
         x :: cnt ~ right, xs ~ Split (left, cnt) 
     *)
     | LCons (x, xs), Split (right, left) -> 
       let cntl_pos, cntl_neg = mk_Name () in 
-      LCons (x, cntl_pos) -- right; 
-      xs -- Split (left, cntl_neg) 
+      LCons (x, cntl_pos) -><- right; 
+      xs -><- Split (left, cntl_neg) 
 
     (* Name handling *)
-    | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -- a)  
+    | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -><- a)  
     | a, NameNeg v -> F.fulfill v (Ok a)
 
-  and ( -- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
+  and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
     fun a1 a2 ->
     R.run_async pool (fun _ -> apply_rule a1 a2)
   in
 
-  a1 -- a2 
+  a1 -><- a2 
 
 let msort pool l = 
   let l_agent = encode_list l in 
