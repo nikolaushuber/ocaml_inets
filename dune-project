@@ -19,7 +19,7 @@
  (name ocaml_inets)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune moonpool)
+ (depends (ocaml (>= 5.1.1)) dune moonpool)
  (allow_empty)
  (tags
   (topics "to describe" your project)))
