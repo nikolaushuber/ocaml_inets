@@ -80,6 +80,12 @@ let num_threads =
 let pool = P.create ~num_threads () 
 
 let () = 
+  try 
+    let seed = int_of_string @@ Sys.argv.(3) in 
+    Random.init seed 
+  with _ -> Random.self_init () 
+
+let () = 
   Random.self_init ();
   let l = List.init n (fun _ -> Random.full_int Int.max_int) in
   let ret = qsort pool l in  

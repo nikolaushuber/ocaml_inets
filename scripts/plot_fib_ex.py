@@ -1,5 +1,12 @@
 import json 
 import matplotlib.pyplot as plt 
+import argparse 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--dpi", type = int, default =  600)
+parser.add_argument("-o", "--output")
+
+args = parser.parse_args() 
 
 def get_res(fname): 
     with open (fname) as f: 
@@ -28,4 +35,7 @@ plt.xlabel("n")
 
 plt.legend()
 
-plt.savefig("./results/fib_ex.png", dpi = 600)
+if args.output: 
+    plt.savefig(args.output, dpi = args.dpi)
+else:
+    plt.show() 
