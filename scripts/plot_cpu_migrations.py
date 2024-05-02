@@ -10,6 +10,8 @@ runs = 10
 parser = argparse.ArgumentParser()
 parser.add_argument("--cpus", type = int, default = 8) 
 parser.add_argument("-r", "--runs", type = int, default = 10)
+parser.add_argument("-o", "--output") 
+parser.add_argument("--dpi", type = int)
 
 args = parser.parse_args() 
 
@@ -54,4 +56,10 @@ plt.legend()
 plt.xlim([0, args.cpus+1])
 plt.xticks(x, label=xticks)
 
-plt.show()
+plt.ylabel("# CPU migrations")
+plt.xlabel("# threads in pool")
+
+if args.output: 
+    plt.savefig(args.output, dpi = args.dpi)
+else:
+    plt.show()
