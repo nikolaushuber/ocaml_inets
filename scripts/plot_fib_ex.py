@@ -26,16 +26,19 @@ plt.figure()
 
 plt.yscale("log") 
 
-plt.plot(x_seq, mean_seq, label="Sequential", linestyle="-")
-plt.plot(x_par, mean_par, label="Parallel", linestyle="--")
-plt.plot(x_inet, mean_inet, label="Interaction Net", linestyle=":")
+plt.plot(x_seq, mean_seq, label="Sequential", linestyle="-", linewidth=2.0)
+plt.plot(x_par, mean_par, label="Parallel", linestyle="--", linewidth=2.0)
+plt.plot(x_inet, mean_inet, label="Interaction Net", linestyle=":", linewidth=2.0)
 
-plt.ylabel("Runtime [s]") 
-plt.xlabel("n")
+plt.ylabel("Runtime [s]", fontsize = 15, fontweight = 'bold') 
+plt.xlabel("n", fontsize = 15, fontweight = 'bold')
 
-plt.legend()
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+
+plt.legend(loc = 'upper left', fontsize = 12)
 
 if args.output: 
-    plt.savefig(args.output, dpi = args.dpi)
+    plt.savefig(args.output, dpi = args.dpi, bbox_inches='tight')
 else:
     plt.show() 

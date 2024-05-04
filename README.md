@@ -44,6 +44,10 @@ make benchmark
 
 in the root of this repository. This will create a folder `results` holding all the images. You may have to first adapt the values in the beginning of `Makefile` to fit your particular processor. 
 
+## License 
+
+MIT. Benchmark inputs for inpla and HINet are under their own licenses, a copy is in the respective folder. 
+
 ## Other interaction net projects 
 
 - [inpla](https://github.com/inpla/inpla/), currently the most performant general interaction net evaluator 

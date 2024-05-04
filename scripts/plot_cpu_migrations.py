@@ -4,12 +4,8 @@ import argparse
 import numpy as np 
 import re 
 
-cpus = 8 
-runs = 10 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--cpus", type = int, default = 8) 
-parser.add_argument("-r", "--runs", type = int, default = 10)
 parser.add_argument("-o", "--output") 
 parser.add_argument("--dpi", type = int)
 
@@ -49,17 +45,18 @@ trans1 = Affine2D().translate(-0.1, 0.0) + ax.transData
 trans2 = Affine2D().translate(0.1, 0.0) + ax.transData 
 
 plt.errorbar(x, fib_mean, fib_std, marker="o", linestyle="none", solid_capstyle='projecting', capsize=5, label="Fib", transform=trans1)
-plt.errorbar(x, q_mean, q_std, marker="o", linestyle="none", solid_capstyle='projecting', capsize=5, label="Quicksort")
-plt.errorbar(x, m_mean, m_std, marker="o", linestyle="none", solid_capstyle='projecting', capsize=5, label="Mergesort", transform=trans2)
+plt.errorbar(x, q_mean, q_std, marker="^", linestyle="none", solid_capstyle='projecting', capsize=5, label="Quicksort")
+plt.errorbar(x, m_mean, m_std, marker="s", linestyle="none", solid_capstyle='projecting', capsize=5, label="Mergesort", transform=trans2)
 
-plt.legend()
+plt.legend(loc = 'upper left', fontsize = 12)
 plt.xlim([0, args.cpus+1])
-plt.xticks(x, label=xticks)
+plt.xticks(x, label=xticks, fontsize = 12)
+plt.yticks(fontsize = 12)
 
-plt.ylabel("# CPU migrations")
-plt.xlabel("# threads in pool")
+plt.ylabel("# CPU migrations", fontsize = 15, fontweight = 'bold')
+plt.xlabel("# threads in pool", fontsize = 15, fontweight = 'bold')
 
 if args.output: 
-    plt.savefig(args.output, dpi = args.dpi)
+    plt.savefig(args.output, dpi = args.dpi, bbox_inches = 'tight')
 else:
     plt.show()

@@ -1,0 +1,28 @@
+module fibonacci{
+  
+  
+  Fib(res) >< 
+    {
+      Num(int x) => 
+        if(x == 0)
+	  res~Num(0);
+	else if(x == 1)
+	  res~Num(1);
+	else
+	  Fib(Add(res1,res)) ~ Num(x-2), Fib(res1) ~ Num(x-1);          
+	
+      
+      
+    }
+  
+    Add(yy,res) >< Num(int x) => yy~Addp(x,res);
+
+
+    Addp(int y,res) >< Num(int x) => res~Num(y+x);
+  
+  
+main(){
+  Fib(result)~Num(25);
+  printNet result;
+}
+}
