@@ -54,6 +54,6 @@ plt.yticks(fontsize=12)
 plt.legend(loc = 'upper left', fontsize = 12)
 
 if args.output: 
-    plt.savefig(args.output, dpi = args.dpi)
+    plt.savefig(args.output, dpi = args.dpi, bbox_inches = 'tight')
 else:
     plt.show() 

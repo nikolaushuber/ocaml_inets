@@ -37,7 +37,7 @@ fib_mean, fib_std = data_of_file('./results/fib_cache.txt')
 q_mean, q_std = data_of_file('./results/qsort_cache.txt')
 m_mean, m_std = data_of_file('./results/msort_cache.txt')
 
-plt.figure (figsize=(10,6))
+plt.figure(figsize=(10,6))
 
 ax = plt.gca() 
 
