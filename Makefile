@@ -7,7 +7,7 @@ NUM_CPUS = 20
 ### Speedup + Fib runtime ### 
 
 # Number of tests to average over 
-NUM_RUNS = 100
+NUM_RUNS = 10
 
 # Number of warmup runs per test 		
 NUM_WARMUP = 5

@@ -52,7 +52,7 @@ p = ax.bar(x-width, inpla_mean, width, label='Inpla')
 ax.bar_label(p, fmt='%.3f', rotation=90, padding=3, fontsize = 12)
 p = ax.bar(x, inet_mean, width, label='OCaml') 
 ax.bar_label(p, fmt='%.3f', rotation=90, padding=3, fontsize = 12)
-p = ax.bar(x+width, hinets_mean, width, label='HINets') 
+p = ax.bar(x+width, hinets_mean, width, label='HINet') 
 ax.bar_label(p, fmt='%.3f', rotation=90, padding=3, fontsize = 12)
 
 ax.legend(loc = 'upper left', fontsize = 12) 
