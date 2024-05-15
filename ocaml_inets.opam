@@ -2,7 +2,7 @@
 opam-version: "2.0"
 synopsis: "Interaction net encodings in OCaml"
 description:
-  "Interaction nets are  graphical programming language based on graph rewriting. This repository holds examples of interaction nets encoded in OCaml, specifically testing out the recently added support for parallel evalution."
+  "Interaction nets are a graphical programming language based on graph rewriting. This repository holds examples of interaction nets encoded in OCaml, specifically testing out the recently added support for parallel evalution."
 maintainer: ["Nikolaus Huber"]
 authors: ["Nikolaus Huber"]
 license: "MIT"

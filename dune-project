@@ -18,7 +18,7 @@
 (package
  (name ocaml_inets)
  (synopsis "Interaction net encodings in OCaml")
- (description "Interaction nets are  graphical programming language based on graph rewriting. This repository holds examples of interaction nets encoded in OCaml, specifically testing out the recently added support for parallel evalution.")
+ (description "Interaction nets are a graphical programming language based on graph rewriting. This repository holds examples of interaction nets encoded in OCaml, specifically testing out the recently added support for parallel evalution.")
  (depends (ocaml (>= 5.1.1)) dune moonpool)
  (allow_empty)
  (tags
