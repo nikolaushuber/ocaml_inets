@@ -1,6 +1,16 @@
-module P = Moonpool.Ws_pool
-module R = Moonpool.Runner 
-module F = Moonpool.Fut 
+type 'a promise = 'a Moonpool.Fut.t 
+type 'a resolver = 'a Moonpool.Fut.promise 
+let resolve v a = Moonpool.Fut.fulfill v (Ok a)
+let await v c = Moonpool.Fut.on_result v (fun a -> c (Result.get_ok a))
+let await_val v = Moonpool.Fut.wait_block_exn v 
+let make_future () = Moonpool.Fut.make () 
+let create_pool num_threads = Moonpool.Ws_pool.create ~num_threads () 
+let run_async pool f = Moonpool.Runner.run_async pool f 
+
+let n = try int_of_string @@ Sys.argv.(1) with _ -> 1000
+let num_threads = try int_of_string @@ Sys.argv.(2) with _ -> 1 
+
+let pool = create_pool num_threads 
 
 type pos = |
 type neg = |
@@ -11,11 +21,11 @@ type (_, _) agent =
   | Append : (int list, neg) agent * (int list, pos) agent -> (int list, neg) agent 
   | LNil : ('a list, pos) agent 
   | LCons : int * (int list, pos) agent -> (int list, pos) agent  
-  | NamePos : ('a, pos) agent F.t -> ('a, pos) agent 
-  | NameNeg : ('a, pos) agent F.promise -> ('a, neg) agent 
+  | NamePos : ('a, pos) agent promise -> ('a, pos) agent 
+  | NameNeg : ('a, pos) agent resolver -> ('a, neg) agent 
 
-let mk_Name () = 
-  let future, promise = F.make () in 
+let new_name () = 
+  let future, promise = make_future () in 
   NamePos future, NameNeg promise
 
 let rec encode_list = function 
@@ -25,59 +35,48 @@ let rec encode_list = function
 let rec decode_list = function 
   | LNil -> [] 
   | LCons (x, xs) -> x :: decode_list xs 
-  | NamePos v -> decode_list (F.wait_block_exn v)
+  | NamePos v -> decode_list (await_val v)
 
-let apply_rule pool a1 a2 =
-  let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit = 
-    fun a1 a2 -> match a1, a2 with 
-    | LNil, QSort ret -> LNil -><- ret 
-    | LCons (x, xs), QSort ret -> 
-      let right_pos, right_neg = mk_Name () in 
-      let smaller = QSort (Append (ret, LCons (x, right_pos))) in 
-      let larger = QSort (right_neg) in 
-      xs -><- (Part (x, smaller, larger)) 
-    | LNil, Part (_, a, b) -> LNil -><- a; LNil -><- b 
-    | LCons (y, ys), Part (x, smaller, larger) when y < x -> 
-      let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (y, cnt_pos)) -><- smaller; 
-      ys -><- (Part (x, cnt_neg, larger)) 
-    | LCons (y, ys), Part (x, smaller, larger) -> 
-      let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (y, cnt_pos)) -><- larger; 
-      ys -><- (Part (x, smaller, cnt_neg))
-    | LNil, Append (ret, listB) -> listB -><- ret 
-    | LCons (x, xs), Append (ret, listB) -> 
-      let cnt_pos, cnt_neg = mk_Name () in 
-      (LCons (x, cnt_pos)) -><- ret; 
-      xs -><- (Append (cnt_neg, listB)) 
-    | NamePos v, a -> F.on_result v (fun a' -> (Result.get_ok a') -><- a)  
-    | a, NameNeg v -> F.fulfill v (Ok a)
+let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit = 
+  fun a1 a2 -> match a1, a2 with 
+  | LNil, QSort ret -> LNil -><- ret 
+  | LCons (x, xs), QSort ret -> 
+    let right_pos, right_neg = new_name () in 
+    let smaller = QSort (Append (ret, LCons (x, right_pos))) in 
+    let larger = QSort (right_neg) in 
+    xs -><- (Part (x, smaller, larger)) 
+  | LNil, Part (_, a, b) -> LNil -><- a; LNil -><- b 
+  | LCons (y, ys), Part (x, smaller, larger) when y < x -> 
+    let cnt_pos, cnt_neg = new_name () in 
+    (LCons (y, cnt_pos)) -><- smaller; 
+    ys -><- (Part (x, cnt_neg, larger)) 
+  | LCons (y, ys), Part (x, smaller, larger) -> 
+    let cnt_pos, cnt_neg = new_name () in 
+    (LCons (y, cnt_pos)) -><- larger; 
+    ys -><- (Part (x, smaller, cnt_neg))
+  | LNil, Append (ret, listB) -> listB -><- ret 
+  | LCons (x, xs), Append (ret, listB) -> 
+    let cnt_pos, cnt_neg = new_name () in 
+    (LCons (x, cnt_pos)) -><- ret; 
+    xs -><- (Append (cnt_neg, listB)) 
+  | NamePos v, a -> await v (fun a' -> a' -><- a)  
+  | a, NameNeg v -> resolve v a
 
-  and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
-    fun a1 a2 ->
-    R.run_async pool (fun _ -> apply_rule a1 a2)
-  in
+and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
+  fun a1 a2 ->
+    run_async pool (fun _ -> apply_rule a1 a2)
 
-  a1 -><- a2 
-
-let qsort pool l = 
+let qsort l = 
   let l_agent = encode_list l in 
-  let ret_pos, ret_neg = mk_Name () in 
-  R.run_async pool (fun _ -> apply_rule pool l_agent (QSort ret_neg)); 
+  let ret_pos, ret_neg = new_name () in 
+  l_agent -><- QSort ret_neg; 
   decode_list ret_pos 
 
 let rec is_sorted x = match x with
-| [] -> true
-| _::[] -> true
-| h::h2::t -> if h <= h2 then is_sorted (h2::t) else false
+  | [] -> true
+  | _ :: [] -> true
+  | h :: h2 :: t -> if h <= h2 then is_sorted (h2 :: t) else false
 
-let n = 
-  try int_of_string @@ Sys.argv.(1) with _ -> 1000
-
-let num_threads = 
-  try int_of_string @@ Sys.argv.(2) with _ -> 1 
-
-let pool = P.create ~num_threads () 
 
 let () = 
   try 
@@ -86,8 +85,7 @@ let () =
   with _ -> Random.self_init () 
 
 let () = 
-  Random.self_init ();
   let l = List.init n (fun _ -> Random.full_int Int.max_int) in
-  let ret = qsort pool l in  
+  let ret = qsort l in
   if not (is_sorted ret) then exit (-1); 
   () 

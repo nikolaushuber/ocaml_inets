@@ -1,12 +1,14 @@
 # Interaction Nets in OCaml 
 
-Interaction nets are a visual programming language built upon graph rewriting. This project holds the code for example nets encoded in the OCaml programming language. 
+Interaction nets are a visual programming language built upon graph rewriting. This project holds the code for example nets encoded in the OCaml programming language. You can find the encoded examples in the `/examples` folder. 
 
 ## Publication
 
 This repository is a companion to the following paper: 
 
-
+An Encoding of Interaction Nets in OCaml, 
+Nikolaus Huber & Wang Yi 
+(under revision)
 
 ## Getting started 
 
@@ -19,7 +21,7 @@ opam switch create . -y
 dune build 
 ```
 
-You can now run the build examples: 
+You can now run the built examples: 
 
 ```bash 
 ./_build/default/examples/fib.exe <n> <num domains> 
@@ -43,6 +45,15 @@ make benchmark
 ```
 
 in the root of this repository. This will create a folder `results` holding all the images. You may have to first adapt the values in the beginning of `Makefile` to fit your particular processor. 
+
+If you would like to recreate the tool comparison graph, you can issue 
+
+```bash 
+make tool_comparison 
+``` 
+
+in the root of this repository. This needs inpla and HINet installed (see below). 
+You will also have to change the paths to those programs in the beginning of `Makefile`. 
 
 ## License 
 

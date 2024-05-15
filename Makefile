@@ -6,7 +6,7 @@ NUM_CPUS = 20
 
 ### Speedup + Fib runtime ### 
 
-# Number of test to average over 
+# Number of tests to average over 
 NUM_RUNS = 100
 
 # Number of warmup runs per test 		
@@ -89,7 +89,7 @@ tool_comparison: results build
 	${HYPERFINE_TOOL}/fib_hinets_20.json -i "timeout ${TOOLS_TIMEOUT} sh -c '${HINETS} +RTS -N${NUM_CPUS} -H8G -M8G -RTS ./benchmarks/RunInets/fibonacci20.inet'"
 	${HYPERFINE_TOOL}/fib_hinets_25.json -i "timeout ${TOOLS_TIMEOUT} sh -c '${HINETS} +RTS -N${NUM_CPUS} -H8G -M8G -RTS ./benchmarks/RunInets/fibonacci25.inet'"
 	${HYPERFINE_TOOL}/fib_hinets_30.json -i "timeout ${TOOLS_TIMEOUT} sh -c '${HINETS} +RTS -N${NUM_CPUS} -H8G -M8G -RTS ./benchmarks/RunInets/fibonacci30.inet'"
-	# ${HYPERFINE_TOOL}/fib_hinets_35.json -i "timeout ${TOOLS_TIMEOUT} sh -c '${HINETS} +RTS -N${NUM_CPUS} -H8G -M8G -RTS ./benchmarks/RunInets/fibonacci35.inet'"
+	${HYPERFINE_TOOL}/fib_hinets_35.json -i "timeout ${TOOLS_TIMEOUT} sh -c '${HINETS} +RTS -N${NUM_CPUS} -H8G -M8G -RTS ./benchmarks/RunInets/fibonacci35.inet'"
 	${PYTHON} scripts/plot_tool_comparison.py -o ./results/tool_comparison.png
 
 results: 
