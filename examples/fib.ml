@@ -1,8 +1,7 @@
 type 'a promise = 'a Moonpool.Fut.t 
 type 'a resolver = 'a Moonpool.Fut.promise 
 let resolve v a = Moonpool.Fut.fulfill v (Ok a)
-let await v c = Moonpool.Fut.on_result v (fun a -> c (Result.get_ok a))
-let await_val v = Moonpool.Fut.wait_block_exn v 
+let await v = Moonpool.Fut.wait_block_exn v 
 let make_future () = Moonpool.Fut.make () 
 let create_pool num_threads = Moonpool.Ws_pool.create ~num_threads () 
 let run_async pool f = Moonpool.Runner.run_async pool f 
@@ -43,7 +42,7 @@ let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit =
     let cnt_pos, cnt_neg = new_name () in 
     Int (n-1) -><- Fib (Add(r, cnt_pos)); 
     Int (n-2) -><- Fib cnt_neg 
-  | NamePos v, a -> await v (fun a' -> a' -><- a)  
+  | NamePos v, a -> await v -><- a
   | a, NameNeg v -> resolve v a
 
 and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
@@ -52,7 +51,7 @@ and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  =
 
 let rec decode_int = function 
   | Int n -> n 
-  | NamePos v -> decode_int (await_val v) 
+  | NamePos v -> decode_int (await v) 
 
 let fib n = 
   let ret_pos, ret_neg = new_name () in 
@@ -60,6 +59,7 @@ let fib n =
   decode_int ret_pos  
 
 let () = 
-  let ret = fib n in  
-  ret |> string_of_int |> print_endline
+  fib n
+  |> string_of_int
+  |> print_endline
   

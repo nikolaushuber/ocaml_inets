@@ -36,6 +36,7 @@ In order to recreate the benchmark graphs from the paper you will need the follo
 - python + matplotlib + numpy 
 - make 
 - bash 
+- hyperfine 
 - perf 
 
 If all of the above are installed, you can issue 

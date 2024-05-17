@@ -1,8 +1,8 @@
 type 'a promise = 'a Moonpool.Fut.t 
 type 'a resolver = 'a Moonpool.Fut.promise 
 let resolve v a = Moonpool.Fut.fulfill v (Ok a)
-let await v c = Moonpool.Fut.on_result v (fun a -> c (Result.get_ok a))
-let await_val v = Moonpool.Fut.wait_block_exn v 
+let await v = Moonpool.Fut.await v 
+let block v = Moonpool.Fut.wait_block_exn v 
 let make_future () = Moonpool.Fut.make () 
 let create_pool num_threads = Moonpool.Ws_pool.create ~num_threads () 
 let run_async pool f = Moonpool.Runner.run_async pool f 
@@ -42,7 +42,7 @@ let rec encode_list = function
 let rec decode_list = function 
   | LNil -> [] 
   | LCons (x, xs) -> x :: decode_list xs 
-  | NamePos v -> decode_list (await_val v)
+  | NamePos v -> decode_list (block v)
 
 let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit = 
   fun a1 a2 -> match a1, a2 with 
@@ -102,7 +102,7 @@ let rec apply_rule : type a. (a, pos) agent -> (a, neg) agent -> unit =
     xs -><- Split (left, cntl_neg) 
 
   (* Name handling *)
-  | NamePos v, a -> await v (fun a' -> a' -><- a)  
+  | NamePos v, a -> await v -><- a  
   | a, NameNeg v -> resolve v a
 
 and ( -><- ) : type a. (a, pos) agent -> (a, neg) agent -> unit  = 
