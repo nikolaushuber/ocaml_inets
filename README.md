@@ -8,7 +8,7 @@ This repository is a companion to the following paper:
 
 An Encoding of Interaction Nets in OCaml, 
 Nikolaus Huber & Wang Yi 
-(under revision)
+(GCM 2024)
 
 ## Getting started 
 
