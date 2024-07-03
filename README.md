@@ -1,5 +1,7 @@
 # Interaction Nets in OCaml 
 
+[![DOI](https://zenodo.org/badge/791889944.svg)](https://zenodo.org/doi/10.5281/zenodo.12633476)
+
 Interaction nets are a visual programming language built upon graph rewriting. This project holds the code for example nets encoded in the OCaml programming language. You can find the encoded examples in the `/examples` folder. 
 
 ## Publication
