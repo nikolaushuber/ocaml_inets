@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  An Encoding of Interaction Nets in OCaml - Software
+  Artifact
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Nikolaus
+    family-names: Huber
+    email: nikolaus.huber@it.uu.se
+    affiliation: Uppsala University
+    orcid: 'https://orcid.org/0000-0002-1616-0602'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.12633477
+repository-code: 'https://github.com/nikolaushuber/ocaml_inets'
+abstract: >-
+  Interaction nets are a visual programming language built
+  upon graph rewriting. This project holds the code for
+  example nets encoded in the OCaml programming language.
+keywords:
+  - interaction nets
+  - ocaml
+  - encoding
+license: MIT
+commit: b6ab8bd8c50788d762e1d69c42fd993fb3e4f5b7
+version: 1.0.0
+date-released: '2024-07-03'
